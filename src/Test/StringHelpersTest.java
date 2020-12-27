@@ -6,7 +6,6 @@ import Helpers.StringHelpers;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StringHelpersTest {
-
     @Test
     void testCapitalize() {
         assertEquals("Hello", StringHelpers.capitalize("hello"));
@@ -27,7 +26,7 @@ class StringHelpersTest {
         assertFalse(StringHelpers.isTitleCase("nO lONGER tITLE cASE"));
         assertFalse(StringHelpers.isTitleCase("-no"));
         assertTrue(StringHelpers.isTitleCase("This Should Be In Title Case"));
-        assertTrue(StringHelpers.isTitleCase("THIS SHOULD STILLL BE TITLE CASE"));
+        assertTrue(StringHelpers.isTitleCase("THIS SHOULD STILL BE TITLE CASE"));
     }
 
     @Test
@@ -40,5 +39,17 @@ class StringHelpersTest {
 
         input = "-nothing to say";
         assertEquals("-nothing To Say", StringHelpers.makeTitleCase(input));
+    }
+
+    @Test
+    void testIsValidDateFormat() {
+        assertTrue(StringHelpers.isValidDateFormat("10/12/1991"));
+        assertTrue(StringHelpers.isValidDateFormat("02/31/1000"));
+        assertTrue(StringHelpers.isValidDateFormat("05/12/1300"));
+        assertFalse(StringHelpers.isValidDateFormat(""));
+        assertFalse(StringHelpers.isValidDateFormat(null));
+        assertFalse(StringHelpers.isValidDateFormat("00/10/1000"));
+        assertFalse(StringHelpers.isValidDateFormat("14/10/1999"));
+        assertFalse(StringHelpers.isValidDateFormat("04/11/3000"));
     }
 }

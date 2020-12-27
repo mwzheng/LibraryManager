@@ -1,6 +1,11 @@
 package Helpers;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringHelpers {
+    private static Pattern dateRegex = Pattern
+            .compile("^(0[1-9]|1[0-2])\\/(0[1-9]|[1-2][0-9]|3[0-1])\\/([1-2][0-9]{3})$");
 
     /**
      * Checks to see if a string is title case. Title case -> first letter of each word is capitalized
@@ -55,5 +60,17 @@ public class StringHelpers {
         }
 
         return input;
+    }
+
+    /**
+     * Returns true if the date is in the correct format. NOTE: This does not mean the date is a valid date.
+     * Valid years: 1000 - 2999, Valid Months: 01 - 12, Valid Days: 01 - 31
+     **/
+    public static boolean isValidDateFormat(String date) {
+        if (date == null || date.equals(""))
+            return false;
+
+        Matcher matcher = dateRegex.matcher(date);
+        return matcher.find();
     }
 }
