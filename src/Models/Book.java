@@ -15,8 +15,8 @@ public class Book {
     private int copiesAvailable;
 
     // Use hashset so that dupes aren't inserted
-    private HashSet<String> authorsList;
-    private HashSet<String> genreList;
+    private final HashSet<String> authorsList;
+    private final HashSet<String> genreList;
 
     public Book(String title) {
         this.title = StringHelpers.makeTitleCase(title);
@@ -80,6 +80,17 @@ public class Book {
     }
 
     /**
+     * Removes a SINGLE genre from the book
+     **/
+    public void removeGenre(String genre) {
+        if (genre == null || genre.equals(""))
+            return;
+
+        genre = StringHelpers.capitalize(genre);
+        genreList.remove(genre);
+    }
+
+    /**
      * Adds a SINGLE author to the book's author list
      **/
     public void addAuthor(String author) {
@@ -88,6 +99,17 @@ public class Book {
 
         author = StringHelpers.makeTitleCase(author);
         authorsList.add(author);
+    }
+
+    /**
+     * Removes a SINGLE author from the book
+     **/
+    public void removeAuthor(String name) {
+        if (name == null || name.equals(""))
+            return;
+
+        name = StringHelpers.makeTitleCase(name);
+        authorsList.remove(name);
     }
 
     /**

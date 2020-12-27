@@ -69,10 +69,17 @@ class BookTest {
         wimp.addGenre("Children");
         assertEquals("[Children]", wimp.getGenres());
 
+        wimp.removeGenre("children");
+        wimp.removeGenre("children");
+        assertEquals("[]", wimp.getGenres());
+
         wimp.addAuthor("jeff kinney");
         wimp.addAuthor("");
         wimp.addAuthor(null);
         wimp.addAuthor("Jeff Kinney");
         assertEquals("[Jeff Kinney]", wimp.getAuthors());
+
+        wimp.removeAuthor("jeff kinney");
+        assertEquals("[]", wimp.getAuthors());
     }
 }
