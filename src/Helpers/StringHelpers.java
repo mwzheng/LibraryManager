@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringHelpers {
-    private static Pattern dateRegex = Pattern
+    private static final Pattern dateRegex = Pattern
             .compile("^(0[1-9]|1[0-2])\\/(0[1-9]|[1-2][0-9]|3[0-1])\\/([1-2][0-9]{3})$");
 
     static final String allChars = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -79,7 +79,6 @@ public class StringHelpers {
         Matcher matcher = dateRegex.matcher(date);
         return matcher.find();
     }
-
 
     /**
      * Generates a ransom string to use for Id for users
