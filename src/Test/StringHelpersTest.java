@@ -3,6 +3,8 @@ package Test;
 import org.junit.jupiter.api.Test;
 import Helpers.StringHelpers;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class StringHelpersTest {
@@ -51,5 +53,31 @@ class StringHelpersTest {
         assertFalse(StringHelpers.isValidDateFormat("00/10/1000"));
         assertFalse(StringHelpers.isValidDateFormat("14/10/1999"));
         assertFalse(StringHelpers.isValidDateFormat("04/11/3000"));
+    }
+
+    @Test
+    void testIdGenerator() {
+        int iterations = 3000;
+        ArrayList<String> randomIds = new ArrayList<>();
+
+        for (int i = 0; i < iterations; i++)
+            randomIds.add(StringHelpers.generateRandomId());
+
+        // Checks that # of iterations == # of unique ids generated
+        long count = randomIds.stream().distinct().count();
+        assertEquals(iterations, count);
+    }
+
+    @Test
+    void testIsAllLetters() {
+        assertTrue(StringHelpers.isAllLetters("yes this is all made of letters"));
+        assertTrue(StringHelpers.isAllLetters("Samuel Jackson"));
+        assertTrue(StringHelpers.isAllLetters("bhuihjkm ihdsfa owiefa sdfad sfasf"));
+        assertTrue(StringHelpers.isAllLetters(" asfds afdf    adfadf adf"));
+
+        assertFalse(StringHelpers.isAllLetters("shou1d not be v0lid"));
+        assertFalse(StringHelpers.isAllLetters("12223 rsaasdad asssss"));
+        assertFalse(StringHelpers.isAllLetters("afaf-1adf sdfsf"));
+        assertFalse(StringHelpers.isAllLetters("asd/-asdf=sdf'fasdf\""));
     }
 }

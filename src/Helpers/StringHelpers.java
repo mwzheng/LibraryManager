@@ -1,11 +1,16 @@
 package Helpers;
 
+import java.security.SecureRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringHelpers {
     private static Pattern dateRegex = Pattern
             .compile("^(0[1-9]|1[0-2])\\/(0[1-9]|[1-2][0-9]|3[0-1])\\/([1-2][0-9]{3})$");
+
+    static final String allChars = "0123456789abcdefghijklmnopqrstuvwxyz";
+    static final int idLength = 12;
+    static SecureRandom random = new SecureRandom();
 
     /**
      * Checks to see if a string is title case. Title case -> first letter of each word is capitalized
@@ -63,7 +68,8 @@ public class StringHelpers {
     }
 
     /**
-     * Returns true if the date is in the correct format. NOTE: This does not mean the date is a valid date.
+     * Returns true if the date is in the correct format.
+     * NOTE: This does not mean the date is a valid date.
      * Valid years: 1000 - 2999, Valid Months: 01 - 12, Valid Days: 01 - 31
      **/
     public static boolean isValidDateFormat(String date) {
@@ -72,5 +78,39 @@ public class StringHelpers {
 
         Matcher matcher = dateRegex.matcher(date);
         return matcher.find();
+    }
+
+
+    /**
+     * Generates a ransom string to use for Id for users
+     * Id has length 12 and can contain letters a - z
+     * and digits 0 - 9
+     **/
+    public static String generateRandomId() {
+        StringBuilder sb = new StringBuilder();
+        int numbPossibleChars = allChars.length();
+
+        for (int i = 0; i < idLength; i++)
+            sb.append(allChars.charAt(random.nextInt(numbPossibleChars)));
+
+        return sb.toString();
+    }
+
+    /**
+     * Checks to see that the input is made up of only
+     * letters of the alphabet or a spaces
+     **/
+    public static boolean isAllLetters(String input) {
+        String[] name = input.split(" ");
+        boolean isAllChars;
+
+        for (String partialName : name) {
+            isAllChars = partialName.chars().allMatch(Character::isLetter);
+
+            if (!isAllChars)
+                return false;
+        }
+
+        return true;
     }
 }
