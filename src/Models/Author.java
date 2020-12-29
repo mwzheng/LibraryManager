@@ -13,7 +13,7 @@ public class Author {
     private int booksWritten;
 
     public Author(String name, String birthDate) {
-        this.name = (StringHelpers.isTitleCase(name)) ? name : StringHelpers.makeTitleCase(name);
+        this.name = name;
         this.birthDate = (StringHelpers.isValidDateFormat(birthDate)) ? birthDate : "Unknown";
         this.bookSet = new HashSet<>();
         this.booksWritten = 0;

@@ -6,7 +6,7 @@ import Models.Author;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthorTest {
-    Author gatsbyAuthor = new Author("f. scott fitzgerald", "09/24/1996");
+    Author gatsbyAuthor = new Author("F. Scott Fitzgerald", "09/24/1996");
     Author cleanCodeAuthor = new Author("Robert C. Martin", "12/05/1952");
 
     @Test

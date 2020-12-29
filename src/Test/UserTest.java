@@ -8,7 +8,7 @@ import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
-    User user1 = new User("sam");
+    User user1 = new User("Sam");
 
     @Test
     void testUserGetterAndSetters() {

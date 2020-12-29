@@ -17,7 +17,7 @@ public class User {
     private String name;
 
     public User(String name) {
-        this.name = StringHelpers.makeTitleCase(name);
+        this.name = name;
         id = StringHelpers.generateRandomId();
         checkOutLimit = defaultCheckOutLimit;
         booksCheckedOut = new ArrayList<>();
