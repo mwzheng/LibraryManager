@@ -19,19 +19,19 @@ public class Book {
     private final HashSet<String> genreList;
 
     public Book(String title) {
-        this.title = StringHelpers.makeTitleCase(title);
-        this.authorsList = new HashSet<>();
-        this.genreList = new HashSet<>();
-        this.totalCopies = this.copiesAvailable = 1;
+        this.title = title;
+        totalCopies = copiesAvailable = 1;
+        authorsList = new HashSet<>();
+        genreList = new HashSet<>();
     }
 
     public Book(String title, String authors, String genre, int totalCopies) {
-        this(title);
-
-        addToSet(authors, this.authorsList);
-        addToSet(genre, this.genreList);
-
+        this.title = title;
         this.totalCopies = this.copiesAvailable = totalCopies;
+        authorsList = new HashSet<>();
+        genreList = new HashSet<>();
+        addToSet(authors, authorsList);
+        addToSet(genre, genreList);
     }
 
     /**
@@ -66,6 +66,17 @@ public class Book {
 
     public void setCopiesAvailable(int copiesAvailable) {
         this.copiesAvailable = copiesAvailable;
+    }
+
+    /**
+     * Returns true if the book is of the given genre.
+     **/
+    public boolean hasGenre(String genre) {
+        if (genre == null)
+            return false;
+
+        genre = (StringHelpers.isTitleCase(genre)) ? genre : StringHelpers.capitalize(genre);
+        return genreList.contains(genre);
     }
 
     /**

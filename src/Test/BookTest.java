@@ -13,11 +13,11 @@ class BookTest {
     Book giver = new Book("The Giver", "Lowis Lowry", "Science Fiction, Dystopian Fiction", 3);
     Book redFern = new Book("Where the Red Fern Grows", "Wilson Rawls", "Adventure, Fiction", 6);
     Book mountain = new Book("My Side of the Mountain", "Jean Craighed George", "Adventure, Fiction", 4);
-    Book cat = new Book("The Cat in the Hat", "Doctor Suess", "Children, Fiction, Picture", 10);
+    Book cat = new Book("The Cat In The Hat", "Doctor Suess", "Children, Fiction, Picture", 10);
     Book eggs = new Book("Green Eggs and Ham", "Doctor Suess", "Picture, Children, Fiction", 3);
     Book lorax = new Book("The Lorax", "Doctor Suess", "Children, Fiction, Picture", 5);
-    Book frog = new Book("Frog and Toad are Friends", "Arnold Lobel", "Fiction, Picture, Children", 4);
-    Book wimp = new Book("Diary of the Wimpy Kid");
+    Book frog = new Book("Frog And Toad Are Friends", "Arnold Lobel", "Fiction, Picture, Children", 4);
+    Book wimp = new Book("Diary Of The Wimpy Kid");
 
     @Test
     void bookTestGettersAndSetters() {

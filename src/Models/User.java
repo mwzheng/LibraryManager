@@ -13,26 +13,26 @@ public class User {
     private static final int defaultCheckOutLimit = 5;
     private final ArrayList<String> booksCheckedOut;
     private int checkOutLimit;
-    private final String id;
+    private String id;
     private String name;
 
     public User(String name) {
         this.name = StringHelpers.makeTitleCase(name);
         id = StringHelpers.generateRandomId();
-        this.checkOutLimit = defaultCheckOutLimit;
+        checkOutLimit = defaultCheckOutLimit;
         booksCheckedOut = new ArrayList<>();
     }
 
     public String getId() {
-        return this.id;
+        return id;
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public int getCheckOutLimit() {
-        return this.checkOutLimit;
+        return checkOutLimit;
     }
 
     public int getNumbBooksCheckedOut() {
@@ -46,6 +46,10 @@ public class User {
     public void setCheckOutLimit(int newLimit) {
         if (newLimit > 0 && newLimit > getNumbBooksCheckedOut())
             this.checkOutLimit = newLimit;
+    }
+
+    public void setId(String newId) {
+        this.id = newId;
     }
 
     /**

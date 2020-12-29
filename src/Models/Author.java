@@ -12,28 +12,30 @@ public class Author {
     private final HashSet<String> bookSet;
     private int booksWritten;
 
-    public Author(String name) {
-        this.name = StringHelpers.makeTitleCase(name);
-        this.birthDate = null;
-        this.booksWritten = 0;
-        bookSet = new HashSet<>();
-    }
-
     public Author(String name, String birthDate) {
-        this(name);
-
-        if (StringHelpers.isValidDateFormat(birthDate))
-            this.birthDate = birthDate;
+        this.name = (StringHelpers.isTitleCase(name)) ? name : StringHelpers.makeTitleCase(name);
+        this.birthDate = (StringHelpers.isValidDateFormat(birthDate)) ? birthDate : "Unknown";
+        this.bookSet = new HashSet<>();
+        this.booksWritten = 0;
     }
 
+    /**
+     * Returns the name of the author.
+     **/
     public String getName() {
-        return name;
+        return this.name;
     }
 
+    /**
+     * Returns the number of known books the author has written.
+     **/
     public int getNumbOfBooksWritten() {
-        return booksWritten;
+        return this.booksWritten;
     }
 
+    /**
+     * Update the name of the author
+     **/
     public void setName(String name) {
         if (name == null || name.equals(""))
             return;
@@ -41,10 +43,16 @@ public class Author {
         this.name = StringHelpers.makeTitleCase(name);
     }
 
+    /**
+     * Returns the birth date of the author
+     **/
     public String getBirthDate() {
-        return birthDate;
+        return this.birthDate;
     }
 
+    /**
+     * Update the author's birth date
+     **/
     public void setBirthDate(String birthDate) {
         if (!StringHelpers.isValidDateFormat(birthDate))
             return;
@@ -62,31 +70,39 @@ public class Author {
     }
 
     /**
-     * Removes a SINGLE book title from author's bookSet
+     * Removes a SINGLE book title from author's bookSet.
      **/
     public void removeBookWritten(String title) {
+        if (title == null || title.equals(""))
+            return;
+
         title = StringHelpers.makeTitleCase(title);
 
-        if (bookSet.contains(title)) {
-            bookSet.remove(title);
+        if (this.bookSet.contains(title)) {
+            this.bookSet.remove(title);
             this.booksWritten--;
         }
     }
 
     /**
-     * Adds a SINGLE book to author's bookSet
+     * Adds a SINGLE book to author's bookSet.
      **/
     public void addBookWritten(String title) {
         if (title == null || title.equals(""))
             return;
 
-        title = StringHelpers.makeTitleCase(title);
-        bookSet.add(title);
+        title = (StringHelpers.isTitleCase(title)) ?
+                title : StringHelpers.makeTitleCase(title);
+
+        if (this.bookSet.contains(title))
+            return;
+
+        this.bookSet.add(title);
         this.booksWritten++;
     }
 
     public String toString() {
-        return "Name: " + name + ", Birth Date: " + ((birthDate == null) ? "Unknown" : birthDate) + ", Books Written: " + booksWritten;
+        return "Name: " + name + ", Birth Date: " + birthDate + ", Books Written: " + booksWritten;
     }
 
     /**
@@ -97,7 +113,6 @@ public class Author {
             return false;
 
         Author otherAuthor = (Author) obj;
-
         return name.equals(otherAuthor.getName()) && birthDate.equals(otherAuthor.getBirthDate());
     }
 }
