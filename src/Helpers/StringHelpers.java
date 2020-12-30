@@ -36,6 +36,10 @@ public class StringHelpers {
         if (input == null || input.equals(""))
             return "";
 
+        // Already Title case
+        if (isTitleCase(input))
+            return input;
+
         StringBuilder sb = new StringBuilder();
         String[] tokens = input.split(" ");
 
@@ -111,5 +115,12 @@ public class StringHelpers {
         }
 
         return true;
+    }
+
+    /**
+     * Returns true if the input is null or an empty string ("")
+     **/
+    public static boolean isNullOrEmptyString(String input) {
+        return input == null || input.equals("");
     }
 }

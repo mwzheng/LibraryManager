@@ -25,13 +25,21 @@ public class Book {
         genreList = new HashSet<>();
     }
 
+    /**
+     * Book Constructor. Title, genres and authors should be passed in using title case
+     * (Ex: Author - Dr. Suess, Title - The Cat In The Hat, Genres - Fiction, Children)
+     **/
     public Book(String title, String authors, String genre, int totalCopies) {
         this.title = title;
         this.totalCopies = this.copiesAvailable = totalCopies;
         authorsList = new HashSet<>();
         genreList = new HashSet<>();
-        addToSet(authors, authorsList);
-        addToSet(genre, genreList);
+
+        if (!StringHelpers.isNullOrEmptyString(authors))
+            addToSet(authors, authorsList);
+
+        if (!StringHelpers.isNullOrEmptyString(genre))
+            addToSet(genre, genreList);
     }
 
     /**
@@ -69,6 +77,18 @@ public class Book {
     }
 
     /**
+     * Increases the totalCopies and availableCopies by given amount
+     * AddCopies must be greater than 0, else do nothing
+     **/
+    public void addBookCopies(int addCopies) {
+        if (addCopies < 0)
+            return;
+
+        setTotalCopies(getTotalCopies() + addCopies);
+        setCopiesAvailable(getCopiesAvailable() + addCopies);
+    }
+
+    /**
      * Returns true if the book is of the given genre.
      **/
     public boolean hasGenre(String genre) {
@@ -80,76 +100,77 @@ public class Book {
     }
 
     /**
-     * Adds a SINGLE genre to the book's genre list
-     **/
-    public void addGenre(String genre) {
-        if (genre == null || genre.equals(""))
-            return;
-
-        genre = StringHelpers.capitalize(genre);
-        genreList.add(genre);
-    }
-
-    /**
-     * Removes a SINGLE genre from the book
-     **/
-    public void removeGenre(String genre) {
-        if (genre == null || genre.equals(""))
-            return;
-
-        genre = StringHelpers.capitalize(genre);
-        genreList.remove(genre);
-    }
-
-    /**
-     * Adds a SINGLE author to the book's author list
+     * Adds a SINGLE author to the book's author list if it's new.
      **/
     public void addAuthor(String author) {
-        if (author == null || author.equals(""))
-            return;
-
-        author = StringHelpers.makeTitleCase(author);
-        authorsList.add(author);
+        addTo(author, authorsList);
     }
 
     /**
-     * Removes a SINGLE author from the book
+     * Adds a SINGLE genre to the book's genre list if it's new.
+     **/
+    public void addGenre(String genre) {
+        addTo(genre, genreList);
+    }
+
+    /**
+     * Adds element (converted to title case if not already) to the given set.
+     **/
+    private void addTo(String element, HashSet<String> set) {
+        if (StringHelpers.isNullOrEmptyString(element))
+            return;
+
+        element = StringHelpers.makeTitleCase(element);
+        set.add(element);
+    }
+
+    /**
+     * Removes a SINGLE genre from the book if it's included in the genreList
+     **/
+    public void removeGenre(String genre) {
+        removeFromSet(genre, genreList);
+    }
+
+    /**
+     * Removes a SINGLE author from the book, if it's in the authorList.
      **/
     public void removeAuthor(String name) {
-        if (name == null || name.equals(""))
-            return;
-
-        name = StringHelpers.makeTitleCase(name);
-        authorsList.remove(name);
+        removeFromSet(name, authorsList);
     }
 
     /**
-     * Increases the totalCopies and availableCopies by given amount
+     * If element is null or "", then do nothing, else remove it from the given set.
+     * Element is converted to title case before removing from set.
      **/
-    public void addBookCopies(int addCopies) {
-        if (addCopies < 0)
+    private void removeFromSet(String element, HashSet<String> set) {
+        if (StringHelpers.isNullOrEmptyString(element))
             return;
 
-        setTotalCopies(getTotalCopies() + addCopies);
-        setCopiesAvailable(getCopiesAvailable() + addCopies);
+        element = StringHelpers.makeTitleCase(element);
+        set.remove(element);
     }
 
     /**
-     * Returns a string representation of author name(s) in sorted order
+     * Returns a Array string representation of author name(s) in sorted order
      **/
     public String getAuthors() {
-        ArrayList<String> authors = new ArrayList<>(authorsList);
-        Collections.sort(authors);
-        return authors.toString();
+        return getSortedList(authorsList);
     }
 
     /**
-     * Returns a string representation of genre(s) in sorted order
+     * Returns a Array string representation of genre(s) in sorted order
      **/
     public String getGenres() {
-        ArrayList<String> genres = new ArrayList<>(genreList);
-        Collections.sort(genres);
-        return genres.toString();
+        return getSortedList(genreList);
+    }
+
+    /**
+     * Given a set, sort it then return string representation of it.
+     **/
+    private String getSortedList(HashSet<String> set) {
+        ArrayList<String> tempList = new ArrayList<>(set);
+        Collections.sort(tempList);
+        return tempList.toString();
     }
 
     /**
@@ -165,7 +186,7 @@ public class Book {
     }
 
     /**
-     * Two books are considered equal if they share the same title & author
+     * Two books are considered equal if they share the same title & author name
      **/
     public boolean equals(Object obj) {
         if (!(obj instanceof Book))
@@ -174,7 +195,6 @@ public class Book {
         Book otherBook = (Book) obj;
         boolean sameTitle = this.title.equals(otherBook.getTitle());
         boolean sameAuthor = this.getAuthors().equals(otherBook.getAuthors());
-
         return sameTitle && sameAuthor;
     }
 }

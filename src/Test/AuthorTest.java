@@ -13,7 +13,7 @@ class AuthorTest {
     void testGettersAndSetters() {
         assertEquals("F. Scott Fitzgerald", gatsbyAuthor.getName());
 
-        String expected = "Name: F. Scott Fitzgerald, Birth Date: 09/24/1996, Books Written: 0";
+        String expected = "Name: F. Scott Fitzgerald, Birth Date: 09/24/1996, Books Written: []";
         assertEquals(expected, gatsbyAuthor.toString());
         assertEquals("09/24/1996", gatsbyAuthor.getBirthDate());
 
@@ -37,6 +37,9 @@ class AuthorTest {
 
         gatsbyAuthor.addBookWritten("tender is the night");
         assertEquals("[Tender Is The Night, The Great Gatsby]", gatsbyAuthor.getBooksWritten());
+
+        String expected = "Name: F. Scott Fitzgerald, Birth Date: 09/24/1996, Books Written: [Tender Is The Night, The Great Gatsby]";
+        assertEquals(expected, gatsbyAuthor.toString());
 
         assertEquals(2, gatsbyAuthor.getNumbOfBooksWritten());
 

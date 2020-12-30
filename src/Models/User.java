@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * Class represents a library user. Each user has a unique id on creation,a name,
- * a list of cooks they've checked out and a cap on # of books they can check out.
+ * Class represents a library user. Each user has a unique id on creation, a name,
+ * a list of books they've checked out and a cap on # of books they can check out.
  **/
 public class User {
     private static final int defaultCheckOutLimit = 5;
@@ -48,6 +48,9 @@ public class User {
             this.checkOutLimit = newLimit;
     }
 
+    /**
+     * Update the id for the user
+     **/
     public void setId(String newId) {
         this.id = newId;
     }
@@ -56,7 +59,7 @@ public class User {
      * Set a new name for user, if the new name is valid
      **/
     public void setName(String newName) {
-        if (newName == null || newName.equals(""))
+        if (StringHelpers.isNullOrEmptyString(newName))
             return;
 
         newName = StringHelpers.makeTitleCase(newName);
@@ -75,10 +78,11 @@ public class User {
     }
 
     /**
-     * Check out a single book from the library
+     * Check out a single book from the library. Prevents user from checking
+     * out two of the same book. or more books than their limit
      **/
     public void checkOutBook(String title) {
-        if (title == null || title.equals(""))
+        if (StringHelpers.isNullOrEmptyString(title))
             return;
 
         title = StringHelpers.makeTitleCase(title);
@@ -93,15 +97,30 @@ public class User {
      * the book checked out, else do nothing.
      **/
     public void returnBook(String title) {
-        if (title == null || title.equals(""))
+        if (StringHelpers.isNullOrEmptyString(title))
             return;
 
         title = StringHelpers.makeTitleCase(title);
         booksCheckedOut.remove(title);
     }
 
+    /**
+     * Returns string in the format:
+     * Id: id, Name: name, Checkout Limit: limit, Books Checked Out: books
+     **/
     public String toString() {
         return "Id: " + id + ", Name: " + name + ", Checkout Limit: " + checkOutLimit +
                 ", Books Checked Out: " + getBooksCheckedOut();
+    }
+
+    /**
+     * Two users are considered equal if they have the same id
+     **/
+    public boolean equals(Object obj) {
+        if (!(obj instanceof User))
+            return false;
+
+        User otherUser = (User) obj;
+        return getId().equals(otherUser.getId());
     }
 }
