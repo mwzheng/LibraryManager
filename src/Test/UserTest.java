@@ -8,7 +8,7 @@ import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
-    User user1 = new User("Sam");
+    User user1 = new User("Sam", "password");
 
     @Test
     void testUserGetterAndSetters() {
@@ -48,9 +48,18 @@ class UserTest {
         boolean added;
 
         for (String name : names) {
-            User newUser = new User(name);
+            User newUser = new User(name, "password");
             added = ids.add(newUser.getId());
             assertTrue(added);
         }
+    }
+
+    @Test
+    void testUserPassword() {
+        User aUser = new User("sam", "verysecurepassword");
+        assertTrue(aUser.isCorrectPassword("verysecurepassword"));
+        aUser.changePassWord("verysecurepassword", "makethisthenewpassword");
+        assertTrue(aUser.isCorrectPassword("makethisthenewpassword"));
+        assertFalse(aUser.isCorrectPassword("nope"));
     }
 }

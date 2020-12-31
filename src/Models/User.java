@@ -15,9 +15,11 @@ public class User {
     private int checkOutLimit;
     private String id;
     private String name;
+    private String password;
 
-    public User(String name) {
+    public User(String name, String password) {
         this.name = name;
+        this.password = password;
         id = StringHelpers.generateRandomId();
         checkOutLimit = defaultCheckOutLimit;
         booksCheckedOut = new ArrayList<>();
@@ -37,6 +39,35 @@ public class User {
 
     public int getNumbBooksCheckedOut() {
         return booksCheckedOut.size();
+    }
+
+    /**
+     * Returns true if the password passed in is the user's password
+     **/
+    public boolean isCorrectPassword(String password) {
+        return this.password.equals(password);
+    }
+
+    /**
+     * Returns true if new password is successfully set
+     **/
+    private boolean setPassword(String password) {
+        if (StringHelpers.isNullOrEmptyString(password))
+            return false;
+
+        this.password = password;
+        return true;
+    }
+
+    /**
+     * Update the user's password to newPassword if the
+     * oldPassword matches current password.
+     **/
+    public boolean changePassWord(String oldPassword, String newPassword) {
+        if (isCorrectPassword(oldPassword))
+            return setPassword(newPassword);
+
+        return false;
     }
 
     /**
