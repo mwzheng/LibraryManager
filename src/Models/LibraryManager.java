@@ -100,7 +100,6 @@ public class LibraryManager {
         System.out.println("The book: " + title + " is not from this library!\n");
     }
 
-
     /**
      * Returns string representation of the author requested if found.
      **/
@@ -130,6 +129,52 @@ public class LibraryManager {
         itemName = StringHelpers.makeTitleCase(itemName);
         return (searchFor.equals("author")) ?
                 authorMap.get(itemName) : bookMap.get(itemName);
+    }
+
+    /**
+     * Returns all titles currently in the library that includes the given genre.
+     * Note: Only searches for a single genre at a time. If null or "" passed in for genre,
+     * then it returns all the book titles in the system.
+     **/
+    public String findBooksByGenre(String genre) {
+        if (genre == null || genre.equals(""))
+            return getAllBookTitles();
+
+        genre = StringHelpers.capitalize(genre);
+        Set<String> booksWithGenre = new HashSet<>();
+
+        for (Book aBook : bookMap.values()) {
+            if (aBook.hasGenre(genre))
+                booksWithGenre.add(aBook.getTitle());
+        }
+
+        return getAllKeys(booksWithGenre);
+    }
+
+    /**
+     * Returns all the author names in the system currently
+     **/
+    public String getAllAuthorNames() {
+        return getAllKeys(authorMap.keySet());
+    }
+
+    /**
+     * Returns the titles of all books currently in the system in sorted order
+     **/
+    public String getAllBookTitles() {
+        return getAllKeys(bookMap.keySet());
+    }
+
+    /**
+     * Returns a string representation of all the keys from the set in sorted order.
+     **/
+    private String getAllKeys(Set<String> set) {
+        if (set.size() == 0)
+            return "There is no information currently available.";
+
+        List<String> tempList = new ArrayList<>(set);
+        Collections.sort(tempList);
+        return tempList.toString().replace("[", "").replace("]", "");
     }
 
     /**
@@ -188,6 +233,28 @@ public class LibraryManager {
     }
 
     /**
+     * Removes book with given title from the system if it
+     * has no copies currently checked out.
+     **/
+    public void removeBook(User user, String title) {
+        title = StringHelpers.makeTitleCase(title);
+        Book book = bookMap.get(title);
+        boolean noCopiesCheckedOut = book.getCopiesAvailable() == book.getTotalCopies();
+        if (noCopiesCheckedOut)
+            bookMap.remove(title);
+
+        System.out.println("Can't remove book: " + title + " there are copies currently checked out.\n");
+    }
+
+    /**
+     * Removes author with the given name from the system
+     **/
+    public void removeAuthor(User user, String name) {
+        name = StringHelpers.makeTitleCase(name);
+        authorMap.remove(name);
+    }
+
+    /**
      * Adds author if they don't exist, else get the author.
      * Then update author's books written with title.
      **/
@@ -207,52 +274,6 @@ public class LibraryManager {
 
             author.addBookWritten(title);
         }
-    }
-
-    /**
-     * Returns all titles currently in the library that includes the given genre.
-     * Note: Only searches for a single genre at a time. If null or "" passed in for genre,
-     * then it returns all the book titles in the system.
-     **/
-    public String findBooksByGenre(String genre) {
-        if (genre == null || genre.equals(""))
-            return getAllBookTitles();
-
-        genre = StringHelpers.capitalize(genre);
-        Set<String> booksWithGenre = new HashSet<>();
-
-        for (Book aBook : bookMap.values()) {
-            if (aBook.hasGenre(genre))
-                booksWithGenre.add(aBook.getTitle());
-        }
-
-        return getAllKeys(booksWithGenre);
-    }
-
-    /**
-     * Returns all the author names in the system currently
-     **/
-    public String getAllAuthorNames() {
-        return getAllKeys(authorMap.keySet());
-    }
-
-    /**
-     * Returns the titles of all books currently in the system in sorted order
-     **/
-    public String getAllBookTitles() {
-        return getAllKeys(bookMap.keySet());
-    }
-
-    /**
-     * Returns a string representation of all the keys from the set in sorted order.
-     **/
-    private String getAllKeys(Set<String> set) {
-        if (set.size() == 0)
-            return "There is no information currently available.";
-
-        List<String> tempList = new ArrayList<>(set);
-        Collections.sort(tempList);
-        return tempList.toString().replace("[", "").replace("]", "");
     }
 
     /**
