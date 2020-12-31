@@ -1,11 +1,15 @@
 package Test;
 
 import Models.LibraryManager;
+import Models.User;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * NOTE: must run all test at once since libManager is built as each test runs in order
+ **/
 class LibraryManagerTest {
     LibraryManager libManger = LibraryManager.getInstance();
 
@@ -46,7 +50,7 @@ class LibraryManagerTest {
     }
 
     @Test
-    void testLibManagerBasics() {
+    void testBasicLibManagerSearches() {
         setUp();
 
         String children = libManger.findBooksByGenre("children");
@@ -55,16 +59,28 @@ class LibraryManagerTest {
         String fiction = "Frog And Toad Are Friends, My Side Of The Mountain, The Cat In The Hat, Where The Red Fern Grows";
         assertEquals(fiction, libManger.findBooksByGenre("fiction"));
 
-        String authors = libManger.getAllAuthorNames();
-        assertEquals("Arnold Lobel, Dr. Suess, F. Scott Fitzgerald, Jean Craighed George, Robert C. Martin, Wilson Rawls", authors);
+        String suess = "Name: Dr. Suess, Birth Date: 03/02/1904, Books Written: [The Cat In The Hat]";
+        assertEquals(suess, libManger.getAuthorByName("dr. suess"));
 
+        String notFound = "Sorry invalid search for sam\n";
+        assertEquals(notFound, libManger.getAuthorByName("sam"));
+
+        String fern = "Title: Where The Red Fern Grows, Author(s): [Wilson Rawls], Genre(s): [Adventure, Fiction], Total Copies: 2";
+        assertEquals(fern, libManger.getBookByTitle("where the red fern grows"));
+
+        String allBookTitles = "Frog And Toad Are Friends, My Side Of The Mountain, The Cat In The Hat, The Great Gatsby, Where The Red Fern Grows";
+        assertEquals(allBookTitles, libManger.getAllBookTitles());
+
+        String authors = "Arnold Lobel, Dr. Suess, F. Scott Fitzgerald, Jean Craighed George, Robert C. Martin, Wilson Rawls";
+        assertEquals(authors, libManger.getAllAuthorNames());
+    }
+
+    @Test
+    void testLibManagerBasics() {
         libManger.addBook("the great gatsby", "f. scott fitzgerald", "historical fiction, american, romance", 10);
 
         String expected = "Title: The Great Gatsby, Author(s): [F. Scott Fitzgerald], Genre(s): [American, Historical Fiction, Romance], Total Copies: 14";
         assertEquals(expected, libManger.getBookByTitle("the great gatsby"));
-
-        String suess = "Name: Dr. Suess, Birth Date: 03/02/1904, Books Written: [The Cat In The Hat]";
-        assertEquals(suess, libManger.getAuthorByName("dr. suess"));
 
         libManger.addBook("the lorax", "dr. suess", "picture, children", 3);
 
@@ -72,7 +88,7 @@ class LibraryManagerTest {
         assertEquals(books, libManger.getAllBookTitles());
 
         libManger.addBook("diary of the wimpy kid", "jeff kinney", "life, Fiction", 9);
-        authors = "Arnold Lobel, Dr. Suess, F. Scott Fitzgerald, Jean Craighed George, Jeff Kinney, Robert C. Martin, Wilson Rawls";
+        String authors = "Arnold Lobel, Dr. Suess, F. Scott Fitzgerald, Jean Craighed George, Jeff Kinney, Robert C. Martin, Wilson Rawls";
         assertEquals(authors, libManger.getAllAuthorNames());
 
         String jeff = "Name: Jeff Kinney, Birth Date: Unknown, Books Written: [Diary Of The Wimpy Kid]";
@@ -84,8 +100,22 @@ class LibraryManagerTest {
     }
 
     @Test
-    void testLibManager() {
+    void testLibManagerRemoveMethods() {
+        User admin = new User("sam", "password");
 
+        libManger.removeBook(admin, "diary of the wimpy kid");
 
+        String books = "Frog And Toad Are Friends, My Side Of The Mountain, The Cat In The Hat, The Great Gatsby, The Lorax, Where The Red Fern Grows";
+        assertEquals(books, libManger.getAllBookTitles());
+
+        libManger.removeBook(admin, "random book");
+        assertEquals(books, libManger.getAllBookTitles());
+
+        libManger.removeAuthor(admin, "jeff kinney");
+        String authors = "Arnold Lobel, Dr. Suess, F. Scott Fitzgerald, Jean Craighed George, Robert C. Martin, Wilson Rawls";
+        assertEquals(authors, libManger.getAllAuthorNames());
+
+        libManger.removeAuthor(admin, "random");
+        assertEquals(authors, libManger.getAllAuthorNames());
     }
 }

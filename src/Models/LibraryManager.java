@@ -2,6 +2,8 @@ package Models;
 
 import Helpers.StringHelpers;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
@@ -19,6 +21,15 @@ public class LibraryManager {
         this.authorMap = new HashMap<>();
         this.bookMap = new HashMap<>();
         this.userMap = new HashMap<>();
+    }
+
+    /**
+     * Starts to populate the library manager with data from text files
+     **/
+    public void startUpManager() throws FileNotFoundException {
+        System.out.println("Starting up Library system.");
+        loadAuthorData();
+        loadBookData();
     }
 
     /**
@@ -239,9 +250,16 @@ public class LibraryManager {
     public void removeBook(User user, String title) {
         title = StringHelpers.makeTitleCase(title);
         Book book = bookMap.get(title);
+
+        if (book == null)
+            return;
+
         boolean noCopiesCheckedOut = book.getCopiesAvailable() == book.getTotalCopies();
-        if (noCopiesCheckedOut)
+
+        if (noCopiesCheckedOut) {
             bookMap.remove(title);
+            return;
+        }
 
         System.out.println("Can't remove book: " + title + " there are copies currently checked out.\n");
     }
@@ -328,5 +346,43 @@ public class LibraryManager {
      **/
     public void printSystemCommands() {
         // TODO
+    }
+
+    /**
+     * Load book data into library manager.
+     **/
+    private void loadBookData() throws FileNotFoundException {
+        File bookFile = new File("books.txt");
+        loadData("books.txt", "Books");
+    }
+
+    /**
+     * Load author data to library manager.
+     **/
+    private void loadAuthorData() throws FileNotFoundException {
+        loadData("authors.txt", "Authors");
+    }
+
+    /**
+     * Based on the dataType (Books, or Authors) as you read add book/author
+     * Book String format: title - author - genre - copies
+     * Author String format: name - birthDate
+     **/
+    private void loadData(String fileName, String dataType) throws FileNotFoundException {
+        File dataFile = new File(fileName);
+        Scanner sc = new Scanner(dataFile);
+        String[] dataParts;
+
+        while (sc.hasNext()) {
+            dataParts = sc.nextLine().split(" - ");
+
+            if (dataType.equals("Books")) {
+                addBook(dataParts[0], dataParts[1], dataParts[2], Integer.parseInt(dataParts[3]));
+            } else if (dataType.equals("Authors")) {
+                addAuthor(dataParts[0], dataParts[1]);
+            } else {
+                System.out.println("Invalid data type loading into library Manager");
+            }
+        }
     }
 }
