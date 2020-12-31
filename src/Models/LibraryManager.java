@@ -32,15 +32,6 @@ public class LibraryManager {
         return INSTANCE;
     }
 
-    /**
-     * Returns the string representation of book requested if found.
-     **/
-    public String getBookByTitle(String title) {
-        Book requestBook = (Book) getRequestedItem(title, "book");
-        return (requestBook == null) ?
-                "Sorry invalid search for " + title + "\n" : requestBook.toString();
-    }
-    
     public int getUniqueBookCount() {
         return bookMap.size();
     }
@@ -53,6 +44,63 @@ public class LibraryManager {
         return userMap.size();
     }
 
+    private boolean bookIsAvailableForCheckOut(String title) {
+        title = StringHelpers.makeTitleCase(title);
+
+        if (bookMap.containsKey(title)) {
+            Book requestBook = bookMap.get(title);
+            return requestBook.getCopiesAvailable() > 0;
+        }
+
+        System.out.println("Sorry the book: " + title + " is not in the system.\n");
+        return false;
+    }
+
+    /**
+     * Adds book to user's checked out list if they can check our more book.
+     * If successful, then also decrements copy of the book available by 1.
+     **/
+    public void checkOutBook(User requester, String title) {
+        if (requester == null || StringHelpers.isNullOrEmptyString(title))
+            return;
+
+        if (!requester.canCheckOutMoreBooks()) {
+            System.out.println("Sorry, you have reached your checkout limit.\n" +
+                    "Please return a book to check out another.\n");
+            return;
+        }
+
+        title = StringHelpers.makeTitleCase(title);
+
+        if (!bookIsAvailableForCheckOut(title)) {
+            System.out.println("Sorry the book: " + title + " is currently unavailable for checkout.\n");
+            return;
+        }
+
+        // Check out book
+        requester.checkOutBook(title);
+        Book bookCheckedOut = bookMap.get(title);
+        bookCheckedOut.checkOutBook();
+    }
+
+    /**
+     * Library user is returning a book with the given title.
+     * If the book doesn't exist in system output message and do nothing.
+     **/
+    public void returnBook(User returner, String title) {
+        title = StringHelpers.makeTitleCase(title);
+
+        if (bookMap.containsKey(title)) {
+            Book returningBook = bookMap.get(title);
+            returningBook.returnBook();
+            returner.returnBook(title);
+            return;
+        }
+
+        System.out.println("The book: " + title + " is not from this library!\n");
+    }
+
+
     /**
      * Returns string representation of the author requested if found.
      **/
@@ -60,6 +108,15 @@ public class LibraryManager {
         Author requestAuthor = (Author) getRequestedItem(name, "author");
         return (requestAuthor == null) ?
                 "Sorry invalid search for " + name + "\n" : requestAuthor.toString();
+    }
+
+    /**
+     * Returns the string representation of book requested if found.
+     **/
+    public String getBookByTitle(String title) {
+        Book requestBook = (Book) getRequestedItem(title, "book");
+        return (requestBook == null) ?
+                "Sorry invalid search for " + title + "\n" : requestBook.toString();
     }
 
     /**
@@ -88,12 +145,10 @@ public class LibraryManager {
             return;
         }
 
-        // Make sure all necessary params are in title case
         title = StringHelpers.makeTitleCase(title);
         author = StringHelpers.makeTitleCase(author);
         genre = StringHelpers.makeTitleCase(genre);
 
-        // Add book to system
         if (!bookMap.containsKey(title)) { // Book doesn't exist, add to library
             bookMap.put(title, new Book(title, author, genre, totalCopies));
         } else if (bookMap.containsKey(title) && totalCopies > 0) { // Book exist already, add copies
@@ -103,6 +158,33 @@ public class LibraryManager {
 
         // Update author map if necessary
         updateAuthorInfo(author, title);
+    }
+
+    /**
+     * Add an author to the library system if they aren't already in the system.
+     * If author exist, birth date is unknown & new birthDate is valid, update it.
+     **/
+    public void addAuthor(String name, String birthDate) {
+        if (StringHelpers.isNullOrEmptyString(name)) {
+            System.out.println("Invalid name when trying to add author to system.\n");
+            return;
+        }
+
+        name = StringHelpers.makeTitleCase(name);
+        boolean isExistingAuthor = authorMap.containsKey(name);
+
+        // Get author if they exist or make new author
+        Author anAuthor = (isExistingAuthor) ? authorMap.get(name) : new Author(name, birthDate);
+
+        if (isExistingAuthor) { // If author exist update birth date if necessary
+            boolean isValidNewDate = StringHelpers.isValidDateFormat(birthDate);
+            boolean currBDayUnknown = anAuthor.getBirthDate().equals("Unknown");
+
+            if (currBDayUnknown && isValidNewDate) anAuthor.setBirthDate(birthDate);
+            return;
+        }
+
+        authorMap.put(name, anAuthor);
     }
 
     /**
@@ -123,34 +205,54 @@ public class LibraryManager {
 
             if (!isExistingAuthor) authorMap.put(anAuthor, author);
 
-            // Update author's books written
             author.addBookWritten(title);
         }
     }
 
     /**
-     * Add an author to the library system if they aren't already in the system.
-     * If author exist, birth date is unknown & new birthDate is valid, update it.
+     * Returns all titles currently in the library that includes the given genre.
+     * Note: Only searches for a single genre at a time. If null or "" passed in for genre,
+     * then it returns all the book titles in the system.
      **/
-    public void addAuthor(String name, String birthDate) {
-        if (StringHelpers.isNullOrEmptyString(name)) {
-            System.out.println("Invalid name when trying to add author to system.\n");
-            return;
+    public String findBooksByGenre(String genre) {
+        if (genre == null || genre.equals(""))
+            return getAllBookTitles();
+
+        genre = StringHelpers.capitalize(genre);
+        Set<String> booksWithGenre = new HashSet<>();
+
+        for (Book aBook : bookMap.values()) {
+            if (aBook.hasGenre(genre))
+                booksWithGenre.add(aBook.getTitle());
         }
 
-        name = StringHelpers.makeTitleCase(name);
-        boolean isExistingAuthor = authorMap.containsKey(name);
-        Author anAuthor = (isExistingAuthor) ? authorMap.get(name) : new Author(name, birthDate);
+        return getAllKeys(booksWithGenre);
+    }
 
-        if (isExistingAuthor) { // Update birth date if necessary
-            boolean isValidNewDate = StringHelpers.isValidDateFormat(birthDate);
-            boolean currBDayUnknown = anAuthor.getBirthDate().equals("Unknown");
+    /**
+     * Returns all the author names in the system currently
+     **/
+    public String getAllAuthorNames() {
+        return getAllKeys(authorMap.keySet());
+    }
 
-            if (currBDayUnknown && isValidNewDate) anAuthor.setBirthDate(birthDate);
-            return;
-        }
+    /**
+     * Returns the titles of all books currently in the system in sorted order
+     **/
+    public String getAllBookTitles() {
+        return getAllKeys(bookMap.keySet());
+    }
 
-        authorMap.put(name, anAuthor);
+    /**
+     * Returns a string representation of all the keys from the set in sorted order.
+     **/
+    private String getAllKeys(Set<String> set) {
+        if (set.size() == 0)
+            return "There is no information currently available.";
+
+        List<String> tempList = new ArrayList<>(set);
+        Collections.sort(tempList);
+        return tempList.toString().replace("[", "").replace("]", "");
     }
 
     /**
@@ -161,13 +263,13 @@ public class LibraryManager {
         if (id == null || name == null || password == null)
             return false;
 
-        boolean hasUser = userMap.containsKey(id);
+        boolean userExist = userMap.containsKey(id);
 
-        if (hasUser) {
+        if (userExist) {
             User theUser = userMap.get(id);
-            boolean isCorrectPassword = theUser.isCorrectPassword(password);
             boolean hasSameName = theUser.getName().equals(name);
-            return isCorrectPassword && hasSameName;
+            boolean isCorrectPassword = theUser.isCorrectPassword(password);
+            return hasSameName && isCorrectPassword;
         }
 
         return false;
@@ -181,8 +283,12 @@ public class LibraryManager {
         if (name == null || password == null)
             return false;
 
-        name = StringHelpers.makeTitleCase(name);
+        if (password.length() < 6 || password.length() > 20) {
+            System.out.println("Invalid password. Must be between 6 - 12 characters.\n");
+            return false;
+        }
 
+        name = StringHelpers.makeTitleCase(name);
         User newUser = new User(name, password);
         String id = newUser.getId();
 
@@ -197,50 +303,8 @@ public class LibraryManager {
     }
 
     /**
-     * Returns all titles currently in the library that includes the given genre
+     * Prints all the input commands valid for the library.
      **/
-    public String findBooksByGenre(String genre) {
-        if (genre == null || genre.equals(""))
-            return getAllBookTitles();
-
-        genre = StringHelpers.capitalize(genre);
-        List<String> booksWithGenre = new ArrayList<>();
-
-        for (Book aBook : bookMap.values()) {
-            if (aBook.hasGenre(genre))
-                booksWithGenre.add(aBook.getTitle());
-        }
-
-        Collections.sort(booksWithGenre);
-        return booksWithGenre.toString().replace("[", "").replace("]", "");
-    }
-
-    /**
-     * Returns all the author names in the system currently
-     **/
-    public String getAllAuthorNames() {
-        StringBuilder sb = new StringBuilder();
-        List<String> names = new ArrayList<>(authorMap.keySet());
-        Collections.sort(names);
-
-        for (String authorName : names)
-            sb.append(authorName).append(", ");
-
-        return sb.substring(0, sb.length() - 2);
-    }
-
-    /**
-     * Returns the titles of all books currently in the system in sorted order
-     **/
-    public String getAllBookTitles() {
-        if (getUniqueBookCount() == 0)
-            return "There are no books currently in the system.";
-
-        List<String> books = new ArrayList<>(bookMap.keySet());
-        Collections.sort(books);
-        return books.toString().replace("[", "").replace("]", "");
-    }
-
     public void printSystemCommands() {
         // TODO
     }

@@ -77,6 +77,20 @@ public class Book {
     }
 
     /**
+     * Called when user returns a copy of the book
+     **/
+    public void returnBook() {
+        copiesAvailable++;
+    }
+
+    /**
+     * Called when a user checks out a copy of the book.
+     **/
+    public void checkOutBook() {
+        copiesAvailable--;
+    }
+
+    /**
      * Increases the totalCopies and availableCopies by given amount
      * AddCopies must be greater than 0, else do nothing
      **/

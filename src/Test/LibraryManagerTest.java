@@ -1,7 +1,7 @@
 package Test;
 
 import Models.LibraryManager;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class LibraryManagerTest {
     LibraryManager libManger = LibraryManager.getInstance();
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         String title, author, genre, copies, birthDate, name;
         String[] info;
 
@@ -47,6 +47,8 @@ class LibraryManagerTest {
 
     @Test
     void testLibManagerBasics() {
+        setUp();
+
         String children = libManger.findBooksByGenre("children");
         assertEquals("Frog And Toad Are Friends, The Cat In The Hat", children);
 
@@ -75,6 +77,10 @@ class LibraryManagerTest {
 
         String jeff = "Name: Jeff Kinney, Birth Date: Unknown, Books Written: [Diary Of The Wimpy Kid]";
         assertEquals(jeff, libManger.getAuthorByName("jeff kinney"));
+
+        assertEquals(7, libManger.getUniqueAuthorCount());
+        assertEquals(0, libManger.getTotalUsers());
+        assertEquals(7, libManger.getUniqueBookCount());
     }
 
     @Test
@@ -82,5 +88,4 @@ class LibraryManagerTest {
 
 
     }
-
 }

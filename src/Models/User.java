@@ -13,9 +13,9 @@ public class User {
     private static final int defaultCheckOutLimit = 5;
     private final ArrayList<String> booksCheckedOut;
     private int checkOutLimit;
-    private String id;
-    private String name;
     private String password;
+    private String name;
+    private String id;
 
     public User(String name, String password) {
         this.name = name;
@@ -42,6 +42,13 @@ public class User {
     }
 
     /**
+     * Returns true if the user hasn't reached their checkout limit
+     **/
+    public boolean canCheckOutMoreBooks() {
+        return booksCheckedOut.size() < checkOutLimit;
+    }
+
+    /**
      * Returns true if the password passed in is the user's password
      **/
     public boolean isCorrectPassword(String password) {
@@ -52,11 +59,18 @@ public class User {
      * Returns true if new password is successfully set
      **/
     private boolean setPassword(String password) {
-        if (StringHelpers.isNullOrEmptyString(password))
+        if (StringHelpers.isNullOrEmptyString(password) || !isValidPassword(password))
             return false;
 
         this.password = password;
         return true;
+    }
+
+    /**
+     * A password is valid if it's between 6 - 20 characters
+     **/
+    private boolean isValidPassword(String password) {
+        return password.length() < 6 || password.length() > 20;
     }
 
     /**
@@ -137,7 +151,7 @@ public class User {
 
     /**
      * Returns string in the format:
-     * Id: id, Name: name, Checkout Limit: limit, Books Checked Out: books
+     * Id: id, Name: name, Checkout Limit: limit, Books Checked Out: [books]
      **/
     public String toString() {
         return "Id: " + id + ", Name: " + name + ", Checkout Limit: " + checkOutLimit +

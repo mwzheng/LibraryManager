@@ -15,7 +15,6 @@ public class Author {
     private String name;
     private String birthDate;
     private final HashSet<String> bookSet;
-    private int booksWritten;
 
     /**
      * Author constructor. Assumes that name passed in is title cased. (EX: Dr. Suess)
@@ -25,7 +24,6 @@ public class Author {
         this.name = name;
         this.birthDate = (StringHelpers.isValidDateFormat(birthDate)) ? birthDate : "Unknown";
         this.bookSet = new HashSet<>();
-        this.booksWritten = 0;
     }
 
     /**
@@ -39,7 +37,7 @@ public class Author {
      * Returns the number of known books the author has written.
      **/
     public int getNumbOfBooksWritten() {
-        return this.booksWritten;
+        return bookSet.size();
     }
 
     /**
@@ -82,9 +80,9 @@ public class Author {
     }
 
     /**
-     * If title is null or "" do nothing. Removes a SINGLE book title from author's
-     * bookSet and decrements the # of books written by author. If the title isn't
-     * in the bookSet, then do nothing
+     * Removes a SINGLE book title from author's bookSet and decrements
+     * the # of books written by author. If the title isn't in the bookSet,
+     * then do nothing. If title is null or "" do nothing.
      **/
     public void removeBookWritten(String title) {
         if (StringHelpers.isNullOrEmptyString(name))
@@ -92,15 +90,12 @@ public class Author {
 
         title = StringHelpers.makeTitleCase(title);
 
-        if (this.bookSet.contains(title)) {
-            this.bookSet.remove(title);
-            this.booksWritten--;
-        }
+        this.bookSet.remove(title);
     }
 
     /**
-     * If title is null or "" do nothing. If title is new adds book to
-     * author's bookSet and increases author's booksWritten.
+     * If title is new, adds book to author's bookSet and increases
+     * author's booksWritten. If title is null or "" do nothing.
      * NOTE: Doesn't add duplicate books
      **/
     public void addBookWritten(String title) {
@@ -109,11 +104,9 @@ public class Author {
 
         title = StringHelpers.makeTitleCase(title);
 
-        if (this.bookSet.contains(title))
-            return;
+        if (this.bookSet.contains(title)) return;
 
-        this.bookSet.add(title);
-        this.booksWritten++;
+        bookSet.add(title);
     }
 
     /**
