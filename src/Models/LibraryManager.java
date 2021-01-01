@@ -63,7 +63,6 @@ public class LibraryManager {
             return requestBook.getCopiesAvailable() > 0;
         }
 
-        System.out.println("Sorry the book: " + title + " is not in the system.\n");
         return false;
     }
 
@@ -76,7 +75,7 @@ public class LibraryManager {
             return;
 
         if (!requester.canCheckOutMoreBooks()) {
-            System.out.println("Sorry, you have reached your checkout limit.\n" +
+            System.out.println("Sorry, you have reached your checkout limit." +
                     "Please return a book to check out another.\n");
             return;
         }
@@ -100,13 +99,18 @@ public class LibraryManager {
      **/
     public void returnBook(User returner, String title) {
         title = StringHelpers.makeTitleCase(title);
+        boolean hasBookCheckedOut = returner.hasBookCheckedOut(title);
 
-        if (bookMap.containsKey(title)) {
+        if (bookMap.containsKey(title) && hasBookCheckedOut) {
             Book returningBook = bookMap.get(title);
             returningBook.returnBook();
             returner.returnBook(title);
             return;
+        } else if (bookMap.containsKey(title) && !hasBookCheckedOut) {
+            System.out.println("You didn't check out the book: " + title + "!\n");
+            return;
         }
+
 
         System.out.println("The book: " + title + " is not from this library!\n");
     }
@@ -345,9 +349,9 @@ public class LibraryManager {
      * Prints all the input commands valid for the library.
      **/
     public void printSystemCommands() {
-        // TODO
-        System.out.println("Enter search to search.");
-        System.out.println("Enter q to quit.");
+        System.out.println(
+                "To Search: (search/s), " + "To check user info: (info/i), " + "To Checkout: (checkout/c), " +
+                        "To return book: (return/r)" + "To logout: (logout/l), " + "To quit: (quit/q), ");
     }
 
     /**
@@ -387,10 +391,57 @@ public class LibraryManager {
         }
     }
 
-    public boolean login(Scanner sc) {
-        return getLoginInfo(sc) != null;
+    public void startLibrary() {
+        Scanner sc = new Scanner(System.in);
+        boolean run = true;
+        String userInput;
+
+        User currentUser = getLoginInfo(sc);
+
+        while (run) {
+            while (currentUser == null)
+                currentUser = getLoginInfo(sc);
+
+            printSystemCommands();
+            userInput = sc.nextLine().toLowerCase().strip();
+
+            if (userInput.equals("logout") || userInput.equals("l"))
+                currentUser = null;
+
+            if (userInput.equals("q") || userInput.equals("quit"))
+                run = false;
+
+            switch (userInput) {
+                case "search":
+                case "s":
+                    searchLibrary(sc);
+                    break;
+                case "checkout":
+                case "c":
+                    if (currentUser.canCheckOutMoreBooks()) {
+                        System.out.println("What book would you like to check out? (enter the book title)");
+                        userInput = sc.nextLine().strip();
+                        checkOutBook(currentUser, userInput);
+                    } else {
+                        System.out.println("You've reached your check out limit please return a book to check out another.");
+                    }
+                    break;
+                case "info":
+                case "i":
+                    userInfo(sc, currentUser);
+                    break;
+                case "return":
+                case "r":
+                    System.out.println("What is the title of the book you would like to return?");
+                    userInput = sc.nextLine().toLowerCase().strip();
+                    returnBook(currentUser, userInput);
+            }
+        }
     }
 
+    /**
+     * Prompt the user to login or create new user account.
+     **/
     public User getLoginInfo(Scanner sc) {
         String name, id = null, password, createUser;
         boolean createNewUser;
@@ -398,7 +449,7 @@ public class LibraryManager {
         while (true) {
             do {
                 System.out.println("Would you like to create a new user? (y/n)");
-                createUser = sc.next().toLowerCase();
+                createUser = sc.nextLine().toLowerCase();
             } while (!createUser.equals("y") && !createUser.equals("n"));
 
             createNewUser = createUser.equals("y");
@@ -406,29 +457,86 @@ public class LibraryManager {
             if (createNewUser)
                 System.out.println("Attempting to create new user.");
 
-            System.out.println("Please enter name.");
-            name = sc.next();
+            System.out.println("Please enter your name.");
+            name = sc.nextLine().strip();
 
             if (!createNewUser) {
-                System.out.println("Please enter id.");
-                id = sc.next();
+                System.out.println("Please enter your id.");
+                id = sc.nextLine().strip();
             }
 
-            System.out.println("Please enter password.");
-            password = sc.next();
+            System.out.println("Please enter your password.");
+            password = sc.nextLine().strip();
 
-            if (createNewUser) {
+            boolean isValidPassword = password.length() >= 6 && password.length() <= 20;
+
+            if (createNewUser && isValidPassword) {
                 User newUser = new User(name, password);
-                System.out.println("Successfully Created new user. Your id is: " + newUser.getId());
+                System.out.println("Successfully Created new user. Your id is: " + newUser.getId() + "\n");
                 userMap.put(newUser.getId(), newUser);
                 return null;
             }
-            
-            if (isValidUser(id, name, password))
+
+            if (isValidUser(id, name, password)) // Correct login info entered
                 return userMap.get(id);
 
-            System.out.println("Invalid login information!");
+            System.out.println("Invalid login information!\n");
         }
     }
 
+
+    /**
+     * Search the library for info based on user input.
+     * b - books (t - by title, g - by genre)
+     * a - author by name
+     **/
+    public void searchLibrary(Scanner sc) {
+        String userInput;
+
+        do {
+            System.out.println("Would you like to search for an author or a book? (a/b)");
+            userInput = sc.nextLine().toLowerCase().strip();
+        } while (!userInput.equals("a") && !userInput.equals("b"));
+
+        if (userInput.equals("a")) {
+            System.out.println("Enter name of author to search for.");
+            userInput = sc.nextLine().strip();
+            System.out.println(getAuthorByName(userInput));
+        } else {
+            do {
+                System.out.println("Would you like to search for book by title or genre? (t/g)");
+                userInput = sc.nextLine().toLowerCase().strip();
+            } while (!userInput.equals("t") && !userInput.equals("g"));
+
+            if (userInput.equals("t")) {
+                System.out.println("Enter the tile of the book you want to search for.");
+                userInput = sc.nextLine().toLowerCase().strip();
+                System.out.println(getBookByTitle(userInput));
+            } else {
+                System.out.println("Enter the genre you're looking for");
+                userInput = sc.nextLine().toLowerCase().strip();
+                System.out.println(findBooksByGenre(userInput));
+            }
+        }
+    }
+
+    /**
+     * Based on user input gives information about the user.
+     * i - returns string representation of current user
+     * b - returns all books user currently has checked out
+     **/
+    public void userInfo(Scanner sc, User currentUser) {
+        String userInput;
+
+        do {
+            System.out.println("What would you like to look up? (i: info, b: books checked out)");
+            userInput = sc.nextLine().toLowerCase().strip();
+        } while (!userInput.equals("b") && !userInput.equals("i"));
+
+        if (userInput.equals("i")) {
+            System.out.println(currentUser);
+        } else {
+            System.out.println(currentUser.getBooksCheckedOut());
+        }
+    }
 }

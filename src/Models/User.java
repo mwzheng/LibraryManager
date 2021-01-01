@@ -149,6 +149,10 @@ public class User {
         booksCheckedOut.remove(title);
     }
 
+    public boolean hasBookCheckedOut(String title) {
+        return booksCheckedOut.contains(title);
+    }
+
     /**
      * Returns string in the format:
      * Id: id, Name: name, Checkout Limit: limit, Books Checked Out: [books]
