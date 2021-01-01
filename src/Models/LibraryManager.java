@@ -346,13 +346,14 @@ public class LibraryManager {
      **/
     public void printSystemCommands() {
         // TODO
+        System.out.println("Enter search to search.");
+        System.out.println("Enter q to quit.");
     }
 
     /**
      * Load book data into library manager.
      **/
     private void loadBookData() throws FileNotFoundException {
-        File bookFile = new File("books.txt");
         loadData("books.txt", "Books");
     }
 
@@ -385,4 +386,49 @@ public class LibraryManager {
             }
         }
     }
+
+    public boolean login(Scanner sc) {
+        return getLoginInfo(sc) != null;
+    }
+
+    public User getLoginInfo(Scanner sc) {
+        String name, id = null, password, createUser;
+        boolean createNewUser;
+
+        while (true) {
+            do {
+                System.out.println("Would you like to create a new user? (y/n)");
+                createUser = sc.next().toLowerCase();
+            } while (!createUser.equals("y") && !createUser.equals("n"));
+
+            createNewUser = createUser.equals("y");
+
+            if (createNewUser)
+                System.out.println("Attempting to create new user.");
+
+            System.out.println("Please enter name.");
+            name = sc.next();
+
+            if (!createNewUser) {
+                System.out.println("Please enter id.");
+                id = sc.next();
+            }
+
+            System.out.println("Please enter password.");
+            password = sc.next();
+
+            if (createNewUser) {
+                User newUser = new User(name, password);
+                System.out.println("Successfully Created new user. Your id is: " + newUser.getId());
+                userMap.put(newUser.getId(), newUser);
+                return null;
+            }
+            
+            if (isValidUser(id, name, password))
+                return userMap.get(id);
+
+            System.out.println("Invalid login information!");
+        }
+    }
+
 }
